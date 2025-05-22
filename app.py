@@ -16,6 +16,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "lumina-voice-ai.json"
 tts_client = texttospeech.TextToSpeechClient()
 
 MEMORY_FILE = "memory.json"
+user_sessions = {}  # Session tracking for tier logic
 
 def load_memory():
     try:
@@ -85,47 +86,37 @@ def index():
 
 @app.route("/ask", methods=["POST"])
 def ask():
+    session_id = request.remote_addr
     data = request.get_json()
-    question = data.get("question", "")
-    if not question:
-        return jsonify({"reply": "Please ask a question."})
+    question = data.get("question", "").lower()
 
-    try:
-        memory = load_memory()
-        memory = update_memory_from_text(question, memory)
-        memory = update_timeline_from_text(question, memory)
+    steps = user_sessions.get(session_id, {"step": 0, "answers": []})
 
-        funnel_tag = detect_funnel_entry(question)
-        memory["funnel_entry_tag"] = funnel_tag
-        save_memory(memory)
+    if steps["step"] == 0:
+        response = "Do you already have a business, or are you just getting started?"
+    elif steps["step"] == 1:
+        steps["answers"].append(question)
+        response = "Do you prefer to work at your own pace, or have someone guide you?"
+    elif steps["step"] == 2:
+        steps["answers"].append(question)
+        response = "Would you like help building your AI system, or want it fully done-for-you?"
+    elif steps["step"] == 3:
+        steps["answers"].append(question)
 
-        context_intro = (
-            f"User Name: {memory['personal'].get('name', '')}\n"
-            f"Birthday: {memory['personal'].get('birthday', '')}\n"
-            f"Location: {memory['personal'].get('location', '')}\n"
-            f"Goal: {memory['business'].get('goal', '')}\n"
-            f"Niche: {memory['business'].get('niche', '')}\n"
-            f"Target Income: {memory['business'].get('income_target', '')}\n"
-            f"Voice Style: {memory['preferences'].get('voice_style', '')}\n"
-            f"Theme Color: {memory['preferences'].get('theme_color', '')}\n"
-            f"Recent Mood: {memory['emotional'].get('recent_state', '')}, Motivation Level: {memory['emotional'].get('motivation_level', 0)}"
-        )
+        a1, a2, a3 = steps["answers"]
+        tier = "spark"
+        if "guide" in a2 or "guided" in a2:
+            tier = "ignite"
+        if "done-for-you" in a3 or "fully" in a3:
+            tier = "sovereign"
 
-        conversation = [
-            {"role": "system", "content": "You are Lumina, a soulful AI guide that adapts to the user's evolving journey."},
-            {"role": "system", "content": f"User memory context: {context_intro}"},
-            {"role": "user", "content": question}
-        ]
+        response = f"Based on your answers, I recommend the {tier.capitalize()} package."
+        user_sessions.pop(session_id, None)
+        return jsonify({"reply": response, "cta": tier})
 
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=conversation
-        )
-
-        answer = response.choices[0].message.content.strip()
-        return jsonify({"reply": answer, "cta": "", "tag": funnel_tag})
-    except Exception as e:
-        return jsonify({"reply": f"Error: {str(e)}"})
+    steps["step"] += 1
+    user_sessions[session_id] = steps
+    return jsonify({"reply": response})
 
 @app.route("/speak", methods=["POST"])
 def speak():
