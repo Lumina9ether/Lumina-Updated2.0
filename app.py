@@ -29,16 +29,6 @@ def save_memory(data):
     with open(MEMORY_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
-def check_missing_memory(memory):
-    missing = []
-    if not memory["personal"].get("name"):
-        missing.append("name")
-    if not memory["business"].get("goal"):
-        missing.append("goal")
-    if not memory["preferences"].get("voice_style"):
-        missing.append("voice_style")
-    return missing
-
 def update_timeline_from_text(text, memory):
     keywords = ["mark today as", "record", "log", "note", "milestone"]
     if any(k in text.lower() for k in keywords):
@@ -66,6 +56,13 @@ def update_memory_from_text(text, memory):
             memory["preferences"]["voice_style"] = style.group(1).strip()
     return memory
 
+def detect_funnel_trigger(text):
+    trigger_phrases = [
+        "what is this", "i'm just looking", "not sure", "how do i start", "curious", 
+        "thinking about it", "exploring", "new to this", "how does this work", "need guidance"
+    ]
+    return any(phrase in text.lower() for phrase in trigger_phrases)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -74,35 +71,58 @@ def index():
 def ask():
     session_id = request.remote_addr
     data = request.get_json()
-    question = data.get("question", "").lower()
+    question = data.get("question", "")
 
+    memory = load_memory()
+    memory = update_memory_from_text(question, memory)
+    memory = update_timeline_from_text(question, memory)
+    save_memory(memory)
+
+    # Check if user is in funnel mode already
     steps = user_sessions.get(session_id, {"step": 0, "answers": []})
 
-    if steps["step"] == 0:
+    # Start funnel logic if triggered
+    if steps["step"] == 0 and detect_funnel_trigger(question):
         response = "Do you already have a business, or are you just getting started?"
-    elif steps["step"] == 1:
-        steps["answers"].append(question)
-        response = "Do you prefer to work at your own pace, or have someone guide you?"
-    elif steps["step"] == 2:
-        steps["answers"].append(question)
-        response = "Would you like help building your AI system, or want it fully done-for-you?"
-    elif steps["step"] == 3:
-        steps["answers"].append(question)
+        steps["step"] += 1
+        user_sessions[session_id] = steps
+        return jsonify({"reply": response})
 
-        a1, a2, a3 = steps["answers"]
-        tier = "spark"
-        if "guide" in a2 or "guided" in a2:
-            tier = "ignite"
-        if "done-for-you" in a3 or "fully" in a3:
-            tier = "sovereign"
+    # Continue funnel steps
+    if steps["step"] > 0:
+        steps["answers"].append(question)
+        if steps["step"] == 1:
+            response = "Do you prefer to work at your own pace, or have someone guide you?"
+        elif steps["step"] == 2:
+            response = "Would you like help building your AI system, or want it fully done-for-you?"
+        elif steps["step"] == 3:
+            a1, a2, a3 = steps["answers"]
+            tier = "spark"
+            if "guide" in a2 or "guided" in a2:
+                tier = "ignite"
+            if "done-for-you" in a3 or "fully" in a3:
+                tier = "sovereign"
+            response = f"Based on your answers, I recommend the {tier.capitalize()} package."
+            user_sessions.pop(session_id, None)
+            return jsonify({"reply": response, "cta": tier})
+        steps["step"] += 1
+        user_sessions[session_id] = steps
+        return jsonify({"reply": response})
 
-        response = f"Based on your answers, I recommend the {tier.capitalize()} package."
-        user_sessions.pop(session_id, None)
-        return jsonify({"reply": response, "cta": tier})
-
-    steps["step"] += 1
-    user_sessions[session_id] = steps
-    return jsonify({"reply": response})
+    # Otherwise: Default GPT-4 Smart Answer
+    try:
+        conversation = [
+            {"role": "system", "content": "You are Lumina, a soulful AI guide that adapts to the user's evolving journey."},
+            {"role": "user", "content": question}
+        ]
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=conversation
+        )
+        answer = response.choices[0].message.content.strip()
+        return jsonify({"reply": answer})
+    except Exception as e:
+        return jsonify({"reply": f"Error: {str(e)}"})
 
 @app.route("/speak", methods=["POST"])
 def speak():
