@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lumina Academy Login</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="/static/auth.js" defer></script>
+</head>
+<body>
+  <h1 class="glow-title">🌟 Welcome to Lumina Academy</h1>
+  <div class="ebook-box" style="max-width: 400px;">
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+    <p id="auth-msg" style="margin-top: 12px; color: #00ffff;"></p>
+  </div>
+</body>
+</html>
