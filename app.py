@@ -66,20 +66,6 @@ def update_memory_from_text(text, memory):
             memory["preferences"]["voice_style"] = style.group(1).strip()
     return memory
 
-def detect_funnel_entry(text):
-    lowered = text.lower()
-    if any(kw in lowered for kw in ["i'm just looking", "what is this", "not sure", "thinking about"]):
-        return "explorer"
-    elif any(kw in lowered for kw in ["how do i start", "help me", "learn", "understand"]):
-        return "curious"
-    elif any(kw in lowered for kw in ["i'm ready", "get started", "invest", "sign up"]):
-        return "ready"
-    elif any(kw in lowered for kw in ["buy", "purchase", "checkout"]):
-        return "buyer"
-    elif any(kw in lowered for kw in ["need support", "have an issue", "need help"]):
-        return "support"
-    return "explorer"
-
 @app.route("/")
 def index():
     return render_template("index.html")
