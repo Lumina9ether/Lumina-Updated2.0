@@ -1,0 +1,20 @@
+{
+  "personal": {
+    "name": "",
+    "birthday": "",
+    "location": ""
+  },
+  "business": {
+    "goal": "",
+    "niche": "",
+    "income_target": ""
+  },
+  "preferences": {
+    "voice_style": "",
+    "theme_color": ""
+  },
+  "emotional": {
+    "motivation_level": 0,
+    "recent_state": ""
+  }
+}

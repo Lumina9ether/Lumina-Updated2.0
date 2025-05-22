@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Lumina Legacy LLC
+  </title>
+  <link href="static/styles.css" rel="stylesheet"/>
+  <style>
+   body {
+      background: url('https://www.transparenttextures.com/patterns/stardust.png'), radial-gradient(ellipse at bottom, #0b0c2a 0%, #000000 100%);
+      background-size: cover;
+      background-attachment: fixed;
+      color: #ffffff;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 5px #fff, 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+    h1.glow-title {
+      text-align: center;
+      font-size: 3rem;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00cccc;
+      margin-top: 1rem;
+    }
+    section {
+      text-align: center;
+      margin: 3rem auto;
+      max-width: 800px;
+      padding: 0 1rem;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+    }
+    .orb-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .orb {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #66fcf1, #1f2833, #0b0c2a);
+      box-shadow: 0 0 30px 15px #00ffe7;
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 15px 5px #00ffe7; }
+      50% { box-shadow: 0 0 35px 20px #00ffe7; }
+      100% { box-shadow: 0 0 15px 5px #00ffe7; }
+    }
+    .tier {
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      box-shadow: 0 0 10px rgba(0,255,255,0.1);
+      cursor: pointer;
+    }
+    .tier:hover {
+      background: rgba(0, 255, 255, 0.1);
+      transform: scale(1.02);
+      border: 1px solid #00ffff;
+      box-shadow: 0 0 20px #00ffff;
+    }
+  
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 20px #00d4ff, 0 0 40px #6e00ff; }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px #00ffff, 0 0 60px #9b00ff; }
+    100% { transform: scale(1); box-shadow: 0 0 20px #00d4ff, 0 0 40px #6e00ff; }
+}
+
+
+#subtitles {
+    max-height: 100px;
+    overflow-y: auto;
+    margin: 20px auto;
+    width: 80%;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #00d4ff;
+    text-align: center;
+    padding: 10px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00d4ff;
+}
+
+#orb.orb-idle {
+    box-shadow: 0 0 20px #6e00ff;
+    background: radial-gradient(circle, #6e00ff 20%, #000 100%);
+}
+#orb.orb-thinking {
+    animation: pulse-think 1s infinite;
+    background: radial-gradient(circle, #ffd700 30%, #000 100%);
+}
+#orb.orb-speaking {
+    animation: pulse-speak 0.5s infinite;
+    background: radial-gradient(circle, #00d4ff 30%, #000 100%);
+}
+@keyframes pulse-think {
+    0% { box-shadow: 0 0 10px #ffd700; }
+    50% { box-shadow: 0 0 20px #ffd700; }
+    100% { box-shadow: 0 0 10px #ffd700; }
+}
+@keyframes pulse-speak {
+    0% { box-shadow: 0 0 10px #00d4ff; }
+    50% { box-shadow: 0 0 25px #00ffff; }
+    100% { box-shadow: 0 0 10px #00d4ff; }
+}
+
+#orb.orb-idle {
+    box-shadow: 0 0 20px #6e00ff;
+    background: radial-gradient(circle at center, #6e00ff 20%, #1a0033 100%);
+}
+#orb.orb-thinking {
+    animation: pulse-think 1.2s infinite;
+    background: radial-gradient(circle at center, #ffcc00 30%, #1a1a00 100%);
+}
+#orb.orb-speaking {
+    animation: pulse-speak 0.6s infinite;
+    background: radial-gradient(circle at center, #00e0ff 30%, #001f33 100%);
+}
+  
+.orb-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 30px auto;
+}
+.particles {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.particles span {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #00ffffaa;
+  border-radius: 50%;
+  animation: floatAround 4s infinite ease-in-out;
+}
+.particles span:nth-child(1) { top: -10px; left: 50%; animation-delay: 0s; }
+.particles span:nth-child(2) { bottom: -10px; right: 50%; animation-delay: 0.5s; }
+.particles span:nth-child(3) { top: 50%; left: -10px; animation-delay: 1s; }
+.particles span:nth-child(4) { top: 20%; right: -10px; animation-delay: 1.5s; }
+.particles span:nth-child(5) { bottom: 20%; left: -10px; animation-delay: 2s; }
+@keyframes floatAround {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
+  50% { transform: translate(10px, -10px) rotate(180deg); opacity: 1; }
+  100% { transform: translate(0, 0) rotate(360deg); opacity: 0.5; }
+}
+
+</style>
+ </head>
+ <body>
+  <div class="orb-wrapper">
+  <div class="orb-idle" id="orb"></div>
+  <div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+</div>
+  </div>
+  <header>
+   <h1 class="glow-title">
+    Lumina Legacy LLC
+   </h1>
+  </header>
+  <section class="hero">
+   <div class="orb-container">
+    <div id="chat-container" style="text-align: center; margin: 30px auto;">
+     <textarea id="user-input" placeholder="Ask Lumina a question..." style="
+    width: 85%;
+    height: 100px;
+    padding: 14px;
+    font-size: 17px;
+    border-radius: 15px;
+    border: 1px solid #6e00ff;
+    box-shadow: 0 0 10px #6e00ff;
+    margin-bottom: 14px;
+    resize: none;
+"></textarea>
+     <br/>
+     <button id="ask-lumina" style="
+        padding: 10px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        background-color: #6e00ff;
+        border: none;
+        border-radius: 25px;
+        box-shadow: 0 0 15px #6e00ff;
+        cursor: pointer;
+    ">
+      Ask Lumina
+     </button>
+     <div id="subtitles">
+     </div>
+    </div>
+    <button id="hey-lumina-button" style="display: block; margin: 20px auto 40px auto; padding: 14px 28px; font-size: 20px; font-weight: bold; color: white; background: radial-gradient(circle at center, #6e00ff, #00d4ff); border: none; border-radius: 30px; box-shadow: 0 0 20px #00d4ff, 0 0 40px #6e00ff; cursor: pointer; animation: pulse 2s infinite;">
+     Hey Lumina
+    </button>
+    <button id="stop-button" style="
+    display: block;
+    margin: 10px auto 30px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: crimson;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 0 15px red;
+">
+     Stop Lumina
+    </button>
+   </div>
+  </section>
+  <section class="mission">
+   <h2>
+    Our Mission
+   </h2>
+   <p>
+    Lumina Legacy LLC is devoted to empowering entrepreneurs and visionaries through cosmic AI automation, spiritual branding, and digital legacy creation. We believe in building wealth with purpose, and using AI as a divine tool for elevation.
+   </p>
+  </section>
+  <section class="ebook">
+   <h2>
+    Free Gift: Lumina’s Guide to a 6-Figure AI-Powered Business
+   </h2>
+   <p>
+    Get instant access to our free eBook and start your journey with Lumina today.
+   </p>
+   <div class="ebook-box">
+    <form>
+     <input placeholder="Your Name" required="" type="text"/>
+     <input placeholder="Your Email" required="" type="email"/>
+     <button type="submit">
+      Claim My Free Gift
+     </button>
+    </form>
+   </div>
+  </section>
+  <section class="packages">
+   <section class="pain-points">
+    <h2>
+     Common Struggles We Solve
+    </h2>
+    <ul>
+     <li>
+      <strong>
+       Overwhelmed by tech?
+      </strong>
+      Lumina simplifies automation with guided flows and built-in intelligence.
+     </li>
+     <li>
+      <strong>
+       Struggling with brand clarity?
+      </strong>
+      Lumina realigns your visual identity and messaging across all platforms.
+     </li>
+     <li>
+      <strong>
+       No leads coming in?
+      </strong>
+      We set up AI-powered funnels and email sequences to convert visitors into buyers.
+     </li>
+     <li>
+      <strong>
+       Time wasted on repetitive tasks?
+      </strong>
+      Lumina handles your emails, posts, and updates so you can focus on vision.
+     </li>
+     <li>
+      <strong>
+       Stuck on content creation?
+      </strong>
+      Lumina generates high-vibration posts, captions, and videos tailored to your niche.
+     </li>
+    </ul>
+   </section>
+   <section class="testimonials">
+    <section class="academy">
+     <h2>
+      Lumina Academy: 100% Profit School
+     </h2>
+     <p>
+      Enroll in our high-frequency academy and get full master resale rights (MRR) on all digital trainings and modules.
+     </p>
+     <div class="enroll">
+      <p>
+       <strong>
+        💫 Enrollment Access:
+       </strong>
+       <s>
+        $497
+       </s>
+       now only
+       <strong>
+        $97
+       </strong>
+      </p>
+      <button onclick="window.location.href='https://buy.stripe.com/test-enrollment-link'">
+       Enroll Now
+      </button>
+     </div>
+     <div class="donate">
+      <p>
+       If you’d like to support our mission, click below to donate:
+      </p>
+      <button onclick="window.location.href='https://buy.stripe.com/test-donate-link'">
+       Donate
+      </button>
+     </div>
+    </section>
+    <script src="static/script.js">
+    </script>
+    <section id="ai-tiers" style="padding: 40px 0; text-align: center;">
+     <h2 class="glow-title">
+      Choose Your AI Tier
+     </h2>
+     <div class="tier-container">
+      <div class="tier-card tier-spark">
+       <h3>
+        🔥 Lumina Spark
+       </h3>
+       <p class="price">
+        $297
+       </p>
+       <ul>
+        <li>
+         Self-paced AI tools
+        </li>
+        <li>
+         Access to Lumina starter logic
+        </li>
+        <li>
+         Basic automation templates
+        </li>
+       </ul>
+       <button onclick="window.open('https://buy.stripe.com/test_00wfZacRcgHV1SA0W2awo00', '_blank')" style="margin-top: 15px; padding: 12px 24px; background: linear-gradient(90deg, #8F00FF, #5500AA); color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; box-shadow: 0 0 12px #8F00FF;">
+        Buy Now
+       </button>
+      </div>
+      <div class="tier-card tier-ignite">
+       <h3>
+        ⚡ Lumina Ignite
+       </h3>
+       <p class="price">
+        $997
+       </p>
+       <ul>
+        <li>
+         7-day guided AI activation
+        </li>
+        <li>
+         Advanced marketing flows
+        </li>
+        <li>
+         Email &amp; funnel builders included
+        </li>
+       </ul>
+       <button onclick="window.open('https://buy.stripe.com/test_cNi7sE3gC1N1eFm6gmawo01', '_blank')" style="margin-top: 15px; padding: 12px 24px; background: linear-gradient(90deg, #8F00FF, #5500AA); color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; box-shadow: 0 0 12px #8F00FF;">
+        Buy Now
+       </button>
+      </div>
+      <div class="tier-card tier-sovereign">
+       <h3>
+        👑 Lumina Sovereign
+       </h3>
+       <p class="price">
+        $2222
+       </p>
+       <ul>
+        <li>
+         Fully done-for-you AI build
+        </li>
+        <li>
+         Custom branding, automation, and sales systems
+        </li>
+        <li>
+         1-on-1 onboarding with team
+        </li>
+       </ul>
+       <button onclick="window.open('https://buy.stripe.com/test_eVqeV68AWgHV0OwcEKawo02', '_blank')" style="margin-top: 15px; padding: 12px 24px; background: linear-gradient(90deg, #8F00FF, #5500AA); color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; box-shadow: 0 0 12px #8F00FF;">
+        Buy Now
+       </button>
+      </div>
+     </div>
+    </section>
+    <section id="testimonials" style="padding: 40px 0;">
+     <h2 class="glow-title">
+      What Our Clients Say
+     </h2>
+     <div class="testimonial-container">
+      <div class="testimonial-card">
+       <p>
+        "Lumina changed the game for my business — within weeks, I was closing automated sales!"
+       </p>
+       <span>
+        — Amanda J., Digital Coach
+       </span>
+      </div>
+      <div class="testimonial-card">
+       <p>
+        "I never imagined AI could help me organize, brand, and scale. Lumina made it real."
+       </p>
+       <span>
+        — Jason T., Course Creator
+       </span>
+      </div>
+      <div class="testimonial-card">
+       <p>
+        "My AI assistant now handles clients, sales, and even content. This is next-level."
+       </p>
+       <span>
+        — Sade M., Entrepreneur
+       </span>
+      </div>
+     </div>
+    </section>
+   </section>
+  </section>
+  <div id="timeline-container">
+   <h2>
+    🌟 Your Journey Milestones
+   </h2>
+   <div id="milestone-list">
+   </div>
+  </div>
+  <div id="memory-editor">
+   <h2>
+    🧠 Edit Your Memory Profile
+   </h2>
+   <form id="memory-form">
+    <input name="name" placeholder="Your Name" type="text"/>
+    <input name="goal" placeholder="Your Goal" type="text"/>
+    <input name="voice_style" placeholder="Preferred Voice Style" type="text"/>
+    <input name="income_target" placeholder="Income Target" type="text"/>
+    <input name="mood" placeholder="Current Mood" type="text"/>
+    <button type="submit">
+     💾 Save Memory
+    </button>
+   </form>
+  </div>
+ </body>
+</html>
